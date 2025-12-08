@@ -4,7 +4,9 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
 import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 
-// --- Firebase Configuration & Initialization ---
+// ==========================================
+// ส่วนตั้งค่า Firebase (แก้ไขตรงนี้ให้เป็นค่าของคุณ)
+// ==========================================
 const firebaseConfig = {
   apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
   authDomain: "yasothon-service.firebaseapp.com",
@@ -14,15 +16,22 @@ const firebaseConfig = {
   appId: "1:848189212038:web:fb0f41ed30195941991807",
   measurementId: "G-NR3PGN2NG3"
 };
+
+// ==========================================
+// ส่วนเริ่มระบบ (ห้ามลบ 3 บรรทัดนี้เด็ดขาด!)
+// ==========================================
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);   // <--- ตัวแปร auth ถูกสร้างตรงนี้
+const db = getFirestore(app); // <--- ตัวแปร db ถูกสร้างตรงนี้
 
-const appId = 'yasothon-service';
+const appId = 'yasothon-service'; 
+
+// ==========================================
+// ส่วนโปรแกรมหลัก
+// ==========================================
 const ServiceSummaryApp = () => {
-  // Configuration
-  const initialYear = 2025; // 2568 - 543
-  const initialMonth = 10; // November
-
-  // State
+  const initialYear = 2025;
+  const initialMonth = 10;
   const [user, setUser] = useState(null);
   const [selectedDate, setSelectedDate] = useState(new Date(initialYear, initialMonth, 1));
   const [data, setData] = useState({});
@@ -30,7 +39,6 @@ const ServiceSummaryApp = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
   
-  // Admin & Login Modal State
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState('');
@@ -38,7 +46,6 @@ const ServiceSummaryApp = () => {
   
   const fileInputRef = useRef(null);
 
-  // Theme Colors
   const colors = {
     purple: '#4A2C6D',
     red: '#D32F2F',
@@ -58,15 +65,11 @@ const ServiceSummaryApp = () => {
     "หน่วยบริการเลิงนกทา"
   ];
 
-  // --- 1. Authentication Setup ---
+  // 1. Authentication
   useEffect(() => {
     const initAuth = async () => {
       try {
-        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-          await signInWithCustomToken(auth, __initial_auth_token);
-        } else {
-          await signInAnonymously(auth);
-        }
+        await signInAnonymously(auth); // เรียกใช้ auth ตรงนี้
       } catch (error) {
         console.error("Auth Error:", error);
       }
@@ -76,9 +79,9 @@ const ServiceSummaryApp = () => {
       setUser(currentUser);
     });
     return () => unsubscribe();
-  }, []);
+  }, []); // auth ถูกประกาศไว้ข้างนอกแล้ว ทำให้เรียกใช้ได้
 
-  // --- 2. Firestore Data Syncing (SHARED/PUBLIC MODE) ---
+  // 2. Data Syncing
   const currentDocId = useMemo(() => {
     const m = selectedDate.getMonth();
     const y = selectedDate.getFullYear();
@@ -87,13 +90,10 @@ const ServiceSummaryApp = () => {
 
   useEffect(() => {
     if (!user) return;
-
     setIsLoading(true);
     setLoadingMessage('กำลังซิงค์ข้อมูลส่วนกลาง...');
-
     try {
       const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'records', currentDocId);
-
       const unsubscribe = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
           const remoteData = docSnap.data().gridData || {};
@@ -106,7 +106,6 @@ const ServiceSummaryApp = () => {
         console.error("Firestore Read Error:", error);
         setIsLoading(false);
       });
-
       return () => unsubscribe();
     } catch (err) {
       console.error("Error setting up listener:", err);
@@ -114,7 +113,6 @@ const ServiceSummaryApp = () => {
     }
   }, [user, currentDocId]);
 
-  // --- Helper Functions ---
   const simulateLoading = (message = 'กำลังประมวลผล...', duration = 800) => {
     setIsLoading(true);
     setLoadingMessage(message);
@@ -137,20 +135,14 @@ const ServiceSummaryApp = () => {
     const dayOfWeek = date.getDay();
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
     const thaiDays = ['อา', 'จ', 'อ', 'พ', 'พฤ', 'ศ', 'ส'];
-    
-    return {
-      name: thaiDays[dayOfWeek],
-      isWeekend,
-      dayOfWeek
-    };
+    return { name: thaiDays[dayOfWeek], isWeekend, dayOfWeek };
   };
 
-  // --- Admin Logic ---
   const handleAdminToggle = () => {
     if (isAdmin) {
-      setIsAdmin(false); // Logout immediately
+      setIsAdmin(false);
     } else {
-      setShowAdminModal(true); // Open Modal
+      setShowAdminModal(true);
       setAdminPasswordInput('');
       setLoginError('');
     }
@@ -166,7 +158,6 @@ const ServiceSummaryApp = () => {
     }
   };
 
-  // --- Input Handling & Saving ---
   const handleInputChange = (unitIndex, day, value) => {
     const key = `${unitIndex}-${day}`;
     if (value === '' || /^\d+$/.test(value)) {
@@ -194,17 +185,14 @@ const ServiceSummaryApp = () => {
     }
   };
 
-  // Auto-save effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (user) {
         saveToFirestore(data);
       }
     }, 1500); 
-
     return () => clearTimeout(timeoutId);
   }, [data, user]); 
-
 
   const calculateDailyTotal = (day) => {
     let sum = 0;
@@ -236,7 +224,6 @@ const ServiceSummaryApp = () => {
   };
 
   const clearData = async () => {
-    // Custom confirm dialog logic could be implemented here, but standard confirm is usually okay for destructive actions
     if(window.confirm('⚠️ คำเตือน: คุณกำลังจะลบ "ข้อมูลส่วนกลาง" ทั้งหมดของเดือนนี้\n\nการกระทำนี้จะส่งผลต่อผู้ใช้งานทุกคนที่กำลังดูหน้านี้อยู่ ยืนยันที่จะลบหรือไม่?')) {
       simulateLoading('กำลังล้างข้อมูลส่วนกลาง...');
       const emptyData = {};
@@ -248,11 +235,9 @@ const ServiceSummaryApp = () => {
     }
   };
 
-  // --- Export / Import CSV ---
   const exportToCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
     csvContent += "ที่,หน่วยบริการ," + days.map(d => `วันที่ ${d}`).join(",") + "\n";
-    
     serviceUnits.forEach((unit, index) => {
       let row = `${index + 1},"${unit}"`;
       days.forEach(day => {
@@ -260,13 +245,11 @@ const ServiceSummaryApp = () => {
       });
       csvContent += row + "\n";
     });
-
     let totalRow = ",รวม";
     days.forEach(day => {
       totalRow += "," + calculateDailyTotal(day);
     });
     csvContent += totalRow + "\n";
-
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -284,9 +267,7 @@ const ServiceSummaryApp = () => {
   const handleFileUpload = (event) => {
     const file = event.target.files[0];
     if (!file) return;
-
     simulateLoading('กำลังนำเข้าข้อมูล...');
-    
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
@@ -294,12 +275,10 @@ const ServiceSummaryApp = () => {
         const rows = text.split('\n');
         const newData = { ...data };
         let unitCount = 0;
-        
         rows.forEach((row, rowIndex) => {
            const cols = row.split(',');
            const unitName = cols[1]?.replace(/"/g, '');
            const unitIndex = serviceUnits.indexOf(unitName);
-
            if (unitIndex !== -1) {
              days.forEach((day, i) => {
                 const val = cols[i + 2]?.trim();
@@ -310,21 +289,16 @@ const ServiceSummaryApp = () => {
              unitCount++;
            }
         });
-
         if (unitCount > 0) {
           setData(newData);
           if (user) {
             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'records', currentDocId);
-             setDoc(docRef, { 
-              gridData: newData,
-              lastUpdated: new Date()
-            }, { merge: true });
+             setDoc(docRef, { gridData: newData, lastUpdated: new Date() }, { merge: true });
           }
           alert(`นำเข้าข้อมูลเรียบร้อย (${unitCount} หน่วยบริการ)\nข้อมูลถูกบันทึกขึ้นระบบกลางแล้ว`);
         } else {
           alert("ไม่พบข้อมูลที่ตรงกับรูปแบบตาราง");
         }
-
       } catch (err) {
         console.error(err);
         alert("เกิดข้อผิดพลาดในการอ่านไฟล์");
@@ -335,26 +309,14 @@ const ServiceSummaryApp = () => {
     reader.readAsText(file);
   };
 
-  const thaiMonths = [
-    "มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน",
-    "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
-  ];
-
+  const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
   const currentThaiYear = selectedDate.getFullYear() + 543;
 
   return (
     <div className="min-h-screen p-4 md:p-6 transition-colors duration-300 relative" style={{ backgroundColor: '#F0F4F8', fontFamily: "'Kanit', sans-serif" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap');
-        
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
-        .input-cell:focus { transform: scale(1.1); z-index: 10; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-      `}</style>
-
-      {/* Loading Overlay */}
+      {/* Link Font */}
+      <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+      
       {isLoading && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex flex-col items-center justify-center text-white animate-in fade-in duration-200">
           <Loader2 className="w-12 h-12 animate-spin mb-4 text-[#FBC02D]" />
@@ -362,7 +324,6 @@ const ServiceSummaryApp = () => {
         </div>
       )}
 
-      {/* Admin Login Modal (NEW) */}
       {showAdminModal && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm animate-in zoom-in-95 duration-200 border-t-4 border-[#4A2C6D]">
@@ -374,7 +335,6 @@ const ServiceSummaryApp = () => {
                 <X size={20} />
               </button>
             </div>
-            
             <form onSubmit={handleLoginSubmit}>
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน (Default: admin)</label>
@@ -389,35 +349,20 @@ const ServiceSummaryApp = () => {
                 {loginError && <p className="text-red-500 text-sm mt-1 animate-pulse">{loginError}</p>}
               </div>
               <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAdminModal(false)}
-                  className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium"
-                >
-                  ยกเลิก
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-sm text-white bg-[#4A2C6D] hover:bg-[#382055] rounded-lg shadow-md transition-colors font-medium"
-                >
-                  เข้าสู่ระบบ
-                </button>
+                <button type="button" onClick={() => setShowAdminModal(false)} className="px-4 py-2 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors font-medium">ยกเลิก</button>
+                <button type="submit" className="px-4 py-2 text-sm text-white bg-[#4A2C6D] hover:bg-[#382055] rounded-lg shadow-md transition-colors font-medium">เข้าสู่ระบบ</button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* Hidden File Input */}
       <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".csv" className="hidden" />
 
       <div className="max-w-[1600px] mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
-        
-        {/* Header Section */}
         <div className="p-6 md:p-8 text-white relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${colors.purple} 0%, #2c1a42 100%)` }}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#FBC02D]/10 rounded-full -ml-12 -mb-12 blur-xl"></div>
-
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
               <div className="flex items-center gap-3 mb-2">
@@ -442,14 +387,11 @@ const ServiceSummaryApp = () => {
                 ศูนย์การศึกษาพิเศษ ประจำจังหวัดยโสธร
               </p>
             </div>
-
-            {/* Date Controls */}
             <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-lg flex flex-col sm:flex-row items-center gap-3">
               <div className="flex items-center gap-2">
                 <Calendar className="text-[#FBC02D]" size={20} />
                 <span className="text-white/90 text-sm font-medium">ประจำเดือน:</span>
               </div>
-              
               <div className="flex gap-2">
                 <select 
                   value={selectedDate.getMonth()} 
@@ -460,7 +402,6 @@ const ServiceSummaryApp = () => {
                     <option key={i} value={i}>{m}</option>
                   ))}
                 </select>
-
                 <div className="flex items-center bg-white/90 rounded-lg px-2 shadow-sm focus-within:ring-2 focus-within:ring-[#FBC02D]">
                   <span className="text-[#4A2C6D] text-sm font-bold mr-1">พ.ศ.</span>
                   <input 
@@ -475,7 +416,6 @@ const ServiceSummaryApp = () => {
           </div>
         </div>
 
-        {/* Toolbar */}
         <div className="bg-gray-50 border-b border-gray-200 p-4 flex flex-wrap justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm flex items-center gap-2">
@@ -495,7 +435,6 @@ const ServiceSummaryApp = () => {
 
           <div className="flex gap-2 items-center">
              {isAdmin ? (
-               // Admin Tools
                <>
                 <button onClick={handleImportClick} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-blue-50 hover:text-blue-700 hover:border-blue-200 transition-all">
                   <Upload size={16} /> นำเข้า
@@ -512,17 +451,13 @@ const ServiceSummaryApp = () => {
                 </button>
                </>
              ) : (
-               // User View Placeholder
                <div className="text-sm text-gray-400 italic mr-2 select-none">
                  *เข้าสู่ระบบ Admin เพื่อจัดการข้อมูล
                </div>
              )}
-            
             <button onClick={() => saveToFirestore(data)} className="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white rounded-lg shadow-md hover:shadow-lg transform active:scale-95 transition-all ml-2" style={{ backgroundColor: colors.blue }}>
               <Save size={16} /> บันทึก
             </button>
-            
-            {/* Admin Toggle Button */}
             <button 
               onClick={handleAdminToggle}
               className={`ml-2 p-2 rounded-full transition-all ${isAdmin ? 'bg-red-100 text-red-600 hover:bg-red-200' : 'bg-gray-200 text-gray-500 hover:bg-gray-300'}`}
@@ -533,7 +468,6 @@ const ServiceSummaryApp = () => {
           </div>
         </div>
 
-        {/* Table Container */}
         <div className="p-4 bg-white">
           <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-inner custom-scrollbar pb-2">
             <table className="w-full border-collapse min-w-[1200px]">
@@ -549,114 +483,59 @@ const ServiceSummaryApp = () => {
                      </span>
                   </th>
                 </tr>
-                
                 <tr>
                   {days.map(day => {
                     const { name, isWeekend } = getDayInfo(day);
                     return (
-                      <th key={`dayname-${day}`} 
-                        className="p-1 text-[10px] text-center w-9 border-r border-white/10"
-                        style={{ backgroundColor: isWeekend ? colors.red : '#2E7D32', color: 'white' }}
-                      >
-                        {name}
-                      </th>
+                      <th key={`dayname-${day}`} className="p-1 text-[10px] text-center w-9 border-r border-white/10" style={{ backgroundColor: isWeekend ? colors.red : '#2E7D32', color: 'white' }}>{name}</th>
                     );
                   })}
                 </tr>
-
                 <tr>
                   {days.map(day => {
                     const { isWeekend } = getDayInfo(day);
                     return (
-                      <th key={`datenum-${day}`} 
-                        className="p-1 text-sm text-center border-r border-white/10 font-light"
-                        style={{ backgroundColor: isWeekend ? colors.red : '#4CAF50', color: 'white' }}
-                      >
-                        {day}
-                      </th>
+                      <th key={`datenum-${day}`} className="p-1 text-sm text-center border-r border-white/10 font-light" style={{ backgroundColor: isWeekend ? colors.red : '#4CAF50', color: 'white' }}>{day}</th>
                     );
                   })}
                 </tr>
               </thead>
-
               <tbody>
                 {serviceUnits.map((unit, index) => (
                   <tr key={index} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-100">
-                    <td className="p-2 text-center text-sm font-bold text-gray-400 bg-gray-50 border-r border-gray-200 group-hover:bg-blue-100/30">
-                      {index + 1}
-                    </td>
-                    <td className="p-2 text-sm font-medium text-gray-700 border-r border-gray-200 group-hover:text-[#0288D1] transition-colors whitespace-nowrap">
-                      {unit}
-                    </td>
+                    <td className="p-2 text-center text-sm font-bold text-gray-400 bg-gray-50 border-r border-gray-200 group-hover:bg-blue-100/30">{index + 1}</td>
+                    <td className="p-2 text-sm font-medium text-gray-700 border-r border-gray-200 group-hover:text-[#0288D1] transition-colors whitespace-nowrap">{unit}</td>
                     {days.map(day => {
                       const { isWeekend } = getDayInfo(day);
-                      
                       return (
                         <td key={day} className={`p-0 h-10 border-r border-gray-100 relative transition-colors ${isWeekend ? 'bg-red-50' : ''}`}>
-                          <input
-                            type="text"
-                            maxLength={3}
-                            placeholder={isWeekend ? "-" : ""}
-                            value={data[`${index}-${day}`] || ''}
-                            onChange={(e) => handleInputChange(index, day, e.target.value)}
-                            className={`input-cell w-full h-full text-center text-sm bg-transparent outline-none transition-all duration-200
-                              ${isWeekend ? 'text-red-500 placeholder-red-200 font-medium' : 'text-gray-700 font-bold hover:bg-blue-50 focus:bg-white'}
-                            `}
-                          />
+                          <input type="text" maxLength={3} placeholder={isWeekend ? "-" : ""} value={data[`${index}-${day}`] || ''} onChange={(e) => handleInputChange(index, day, e.target.value)} className={`input-cell w-full h-full text-center text-sm bg-transparent outline-none transition-all duration-200 ${isWeekend ? 'text-red-500 placeholder-red-200 font-medium' : 'text-gray-700 font-bold hover:bg-blue-50 focus:bg-white'}`}/>
                         </td>
                       );
                     })}
                   </tr>
                 ))}
               </tbody>
-
               <tfoot>
                 <tr className="shadow-lg relative z-10" style={{ backgroundColor: '#E3F2FD' }}>
-                  <td colSpan="2" className="p-3 text-right font-bold text-sm text-[#0288D1] border-r border-blue-200">
-                    📊 รวมยอดรายวัน
-                  </td>
+                  <td colSpan="2" className="p-3 text-right font-bold text-sm text-[#0288D1] border-r border-blue-200">📊 รวมยอดรายวัน</td>
                   {days.map(day => {
                      const total = calculateDailyTotal(day);
-                     return (
-                      <td key={`total-${day}`} className="p-2 text-center text-sm font-bold text-[#0288D1] border-r border-blue-200 bg-blue-50">
-                        {total > 0 && (
-                          <span className="inline-block px-1.5 py-0.5 rounded bg-[#0288D1] text-white text-xs shadow-sm">
-                            {total}
-                          </span>
-                        )}
-                      </td>
-                    );
+                     return <td key={`total-${day}`} className="p-2 text-center text-sm font-bold text-[#0288D1] border-r border-blue-200 bg-blue-50">{total > 0 && <span className="inline-block px-1.5 py-0.5 rounded bg-[#0288D1] text-white text-xs shadow-sm">{total}</span>}</td>;
                   })}
                 </tr>
               </tfoot>
             </table>
           </div>
         </div>
-
         <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500">
-          <div>
-            ระบบฐานข้อมูลกลาง: Firestore (Google Cloud) | สถานะ: {user ? 'เชื่อมต่อสมบูรณ์' : 'กำลังเชื่อมต่อ...'}
-          </div>
+          <div>ระบบฐานข้อมูลกลาง: Firestore (Google Cloud) | สถานะ: {user ? 'เชื่อมต่อสมบูรณ์' : 'กำลังเชื่อมต่อ...'}</div>
           <div className="flex gap-4">
              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#D32F2F]"></div> เสาร์-อาทิตย์</span>
              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#4CAF50]"></div> วันทำการ</span>
           </div>
         </div>
       </div>
-      
-      <style>{`
-        @media print {
-          @page { size: landscape; margin: 10mm; }
-          body { background: white !important; font-family: 'Sarabun', sans-serif; }
-          .shadow-xl, .shadow-lg, .shadow-md { box-shadow: none !important; }
-          .rounded-3xl, .rounded-2xl, .rounded-xl { border-radius: 0 !important; }
-          button, .loading-overlay { display: none !important; }
-          .min-h-screen { padding: 0 !important; }
-          input { border: none !important; text-align: center; }
-          th, td { border: 1px solid #ccc !important; }
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        }
-      `}</style>
     </div>
   );
 };
