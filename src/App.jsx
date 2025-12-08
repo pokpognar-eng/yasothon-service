@@ -15,7 +15,6 @@ const firebaseConfig = {
   measurementId: "G-NR3PGN2NG3"
 };
 const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
 
 const appId = 'yasothon-service';
 const ServiceSummaryApp = () => {
