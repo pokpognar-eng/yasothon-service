@@ -5,11 +5,15 @@ import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken }
 import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 
 // --- Firebase Configuration & Initialization ---
-const firebaseConfig = JSON.parse(__firebase_config);
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const firebaseConfig = {
+  apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
+  authDomain: "yasothon-service.firebaseapp.com",
+  projectId: "yasothon-service",
+  storageBucket: "yasothon-service.firebasestorage.app",
+  messagingSenderId: "848189212038",
+  appId: "1:848189212038:web:fb0f41ed30195941991807",
+  measurementId: "G-NR3PGN2NG3"
+};
 
 const ServiceSummaryApp = () => {
   // Configuration
