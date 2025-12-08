@@ -14,7 +14,10 @@ const firebaseConfig = {
   appId: "1:848189212038:web:fb0f41ed30195941991807",
   measurementId: "G-NR3PGN2NG3"
 };
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
+const appId = 'yasothon-service';
 const ServiceSummaryApp = () => {
   // Configuration
   const initialYear = 2025; // 2568 - 543
