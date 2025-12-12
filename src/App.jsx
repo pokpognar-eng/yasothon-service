@@ -10,15 +10,24 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 const ADMIN_PASSWORD = "qwerTyuiop1234"; 
 
 // ==========================================
-// ⚙️ ส่วนตั้งค่า Firebase (Configuration)
+// ⚙️ ส่วนตั้งค่า Firebase (Configuration) - แก้ไขใหม่ให้เสถียรขึ้น
 // ==========================================
 let firebaseConfig;
 
 try {
-  // 1. สำหรับการแสดงผลในหน้าจอ Canvas (ใช้ค่าอัตโนมัติ)
-  firebaseConfig = JSON.parse(__firebase_config);
+  // 1. พยายามดึงค่าอัตโนมัติ (สำหรับ Canvas)
+  // ตรวจสอบว่าตัวแปรมีอยู่จริงไหมก่อนเรียกใช้
+  if (typeof __firebase_config !== 'undefined') {
+    firebaseConfig = JSON.parse(__firebase_config);
+  }
 } catch (e) {
-  const firebaseConfig = {
+  console.warn("Auto config failed, using manual config.");
+}
+
+// 2. ถ้าค่าว่าง หรือหาไม่เจอ ให้ใช้ค่าที่คุณกำหนดเอง (สำหรับ GitHub/Vercel)
+// ⚠️⚠️ แก้ไขตรงนี้: ใส่ค่า Config จริงของคุณที่ได้จาก Firebase Console ⚠️⚠️
+if (!firebaseConfig) {
+  firebaseConfig = {
   apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
   authDomain: "yasothon-service.firebaseapp.com",
   projectId: "yasothon-service",
@@ -26,7 +35,7 @@ try {
   messagingSenderId: "848189212038",
   appId: "1:848189212038:web:fb0f41ed30195941991807",
   measurementId: "G-NR3PGN2NG3"
-};
+  };
 }
 
 // ==========================================
@@ -92,8 +101,8 @@ const ServiceSummaryApp = () => {
         }
       } catch (error) {
         console.error("Auth Error:", error);
-        if (error.code === 'auth/api-key-not-valid') {
-           setErrorMsg("API Key ไม่ถูกต้อง (กรุณาตรวจสอบการตั้งค่า Firebase ในโค้ด)");
+        if (error.code === 'auth/api-key-not-valid' || error.code === 'app/no-options') {
+           setErrorMsg("การตั้งค่า Firebase ไม่ถูกต้อง (กรุณาตรวจสอบ API Key ในไฟล์ src/App.jsx)");
         } else {
            setErrorMsg("ไม่สามารถเชื่อมต่อระบบสมาชิกได้");
         }
@@ -613,4 +622,4 @@ const ServiceSummaryApp = () => {
   );
 };
 
-export default ServiceSummaryApp; // <--- บรรทัดนี้สำคัญมากสำหรับการนำไปใช้ ห้ามหาย!
+export default ServiceSummaryApp;
