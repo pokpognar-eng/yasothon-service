@@ -1,13 +1,14 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Calendar, Save, Printer, Trash2, Loader2, CheckCircle2, Download, Upload, FileSpreadsheet, Globe, Lock, Unlock, X } from 'lucide-react';
+import { Calendar, Save, Printer, Trash2, Loader2, CheckCircle2, Download, Upload, FileSpreadsheet, Globe, Lock, Unlock, X, AlertTriangle } from 'lucide-react';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
 import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 
 // ==========================================
-// 🔐 ส่วนตั้งค่ารหัสผ่าน Admin (แก้ไขตรงนี้)
+// 🔐 ส่วนตั้งค่ารหัสผ่าน Admin
 // ==========================================
-const ADMIN_PASSWORD = "qwerTyuiop1234"; // <--- เปลี่ยนรหัสผ่านตรงนี้เป็นของคุณเอง
+const ADMIN_PASSWORD = "qwerTyuiop1234"; 
+
 // ==========================================
 // ⚙️ ส่วนตั้งค่า Firebase (Configuration)
 // ==========================================
@@ -17,8 +18,7 @@ try {
   // 1. สำหรับการแสดงผลในหน้าจอ Canvas (ใช้ค่าอัตโนมัติ)
   firebaseConfig = JSON.parse(__firebase_config);
 } catch (e) {
-  // 2. สำหรับนำไปใช้งานจริงบน GitHub/Vercel (Fallback)
-const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
   authDomain: "yasothon-service.firebaseapp.com",
   projectId: "yasothon-service",
@@ -613,4 +613,4 @@ const ServiceSummaryApp = () => {
   );
 };
 
-export default ServiceSummaryApp; // <--- บรรทัดนี้สำคัญมาก ห้ามหาย!
+export default ServiceSummaryApp; // <--- บรรทัดนี้สำคัญมากสำหรับการนำไปใช้ ห้ามหาย!
