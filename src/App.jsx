@@ -9,7 +9,20 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 // ==========================================
 const ADMIN_PASSWORD = "qwerTyuiop1234"; 
 
-const firebaseConfig = {
+// ==========================================
+// ⚙️ ส่วนตั้งค่า Firebase (Configuration)
+// ==========================================
+let firebaseConfig;
+
+try {
+  // 1. สำหรับการแสดงผลในหน้าจอ Canvas (ใช้ค่าอัตโนมัติ)
+  firebaseConfig = JSON.parse(__firebase_config);
+} catch (e) {
+  // 2. สำหรับนำไปใช้งานจริงบน GitHub/Vercel (Fallback)
+  // ⚠️⚠️ แก้ไขตรงนี้: ใส่ค่า Config จริงของคุณที่ได้จาก Firebase Console ⚠️⚠️
+  console.warn("Using manual config fallback");
+  firebaseConfig = {
+    const firebaseConfig = {
   apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
   authDomain: "yasothon-service.firebaseapp.com",
   projectId: "yasothon-service",
@@ -18,17 +31,8 @@ const firebaseConfig = {
   appId: "1:848189212038:web:fb0f41ed30195941991807",
   measurementId: "G-NR3PGN2NG3"
 };
-// 2. พยายามดึงค่าอัตโนมัติ (เฉพาะตอนพรีวิวใน Canvas)
-try {
-  if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-    const canvasConfig = JSON.parse(__firebase_config);
-    // ถ้ามีค่าจาก Canvas ให้ใช้แทน (เพื่อให้คุณเล่นในหน้านี้ได้)
-    if (canvasConfig && canvasConfig.apiKey) {
-        firebaseConfig = canvasConfig;
-    }
-  }
-} catch (e) {
-  console.warn("Using manual config fallback.");
+
+  };
 }
 
 // ==========================================
@@ -94,8 +98,8 @@ const ServiceSummaryApp = () => {
         }
       } catch (error) {
         console.error("Auth Error:", error);
-        if (error.code === 'auth/api-key-not-valid' || error.code === 'app/no-options') {
-           setErrorMsg("การตั้งค่า Firebase ไม่ถูกต้อง (กรุณาตรวจสอบ API Key ในไฟล์ src/App.jsx)");
+        if (error.code === 'auth/api-key-not-valid') {
+           setErrorMsg("API Key ไม่ถูกต้อง (กรุณาตรวจสอบการตั้งค่า Firebase ในโค้ด)");
         } else {
            setErrorMsg("ไม่สามารถเชื่อมต่อระบบสมาชิกได้");
         }
@@ -124,7 +128,6 @@ const ServiceSummaryApp = () => {
     setIsLoading(true);
     setLoadingMessage('กำลังเชื่อมต่อฐานข้อมูล...');
     
-    // Path Structure: /artifacts/{appId}/public/data/{collectionName}/{docId}
     const docPath = `artifacts/${appId}/public/data/service_summary/${currentDocId}`;
     console.log("Connecting to Firestore Path:", docPath);
 
@@ -587,6 +590,17 @@ const ServiceSummaryApp = () => {
             </table>
           </div>
         </div>
+
+        {/* Signature Block - Print Only */}
+        <div className="hidden print:flex justify-end mt-10 mr-10 break-inside-avoid">
+          <div className="text-center w-64">
+            <p className="mb-2">(................................................)</p>
+            <p className="font-bold">นายณรงค์ฤทธิ์ ปกป้อง</p>
+            <p>นายทะเบียนนักเรียน</p>
+            <p>ผู้รายงานข้อมูล</p>
+          </div>
+        </div>
+
         <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500 print:hidden">
           <div>ระบบฐานข้อมูลกลาง: Firestore (Google Cloud) | สถานะ: {user ? 'เชื่อมต่อสมบูรณ์' : 'กำลังเชื่อมต่อ...'}</div>
           <div className="flex gap-4">
