@@ -5,6 +5,11 @@ import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken }
 import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 
 // ==========================================
+// 🔐 ส่วนตั้งค่ารหัสผ่าน Admin (แก้ไขตรงนี้)
+// ==========================================
+const ADMIN_PASSWORD = "qwerTyuiop1234"; // <--- เปลี่ยนรหัสผ่านตรงนี้เป็นของคุณเอง
+
+// ==========================================
 // ส่วนตั้งค่า Firebase (แก้ไขตรงนี้ให้เป็นค่าของคุณ)
 // ==========================================
 const firebaseConfig = {
@@ -18,13 +23,13 @@ const firebaseConfig = {
 };
 
 // ==========================================
-// ส่วนเริ่มระบบ (ห้ามลบ 3 บรรทัดนี้เด็ดขาด!)
+// ส่วนเริ่มระบบ
 // ==========================================
 const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);   // <--- ตัวแปร auth ถูกสร้างตรงนี้
-const db = getFirestore(app); // <--- ตัวแปร db ถูกสร้างตรงนี้
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const appId = 'yasothon-service'; 
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
 // ==========================================
 // ส่วนโปรแกรมหลัก
@@ -69,7 +74,11 @@ const ServiceSummaryApp = () => {
   useEffect(() => {
     const initAuth = async () => {
       try {
-        await signInAnonymously(auth); // เรียกใช้ auth ตรงนี้
+        if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+          await signInWithCustomToken(auth, __initial_auth_token);
+        } else {
+          await signInAnonymously(auth);
+        }
       } catch (error) {
         console.error("Auth Error:", error);
       }
@@ -79,7 +88,7 @@ const ServiceSummaryApp = () => {
       setUser(currentUser);
     });
     return () => unsubscribe();
-  }, []); // auth ถูกประกาศไว้ข้างนอกแล้ว ทำให้เรียกใช้ได้
+  }, []);
 
   // 2. Data Syncing
   const currentDocId = useMemo(() => {
@@ -150,7 +159,8 @@ const ServiceSummaryApp = () => {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    if (adminPasswordInput === 'admin') {
+    // ใช้รหัสผ่านจากตัวแปร ADMIN_PASSWORD ที่ตั้งไว้ข้างบน
+    if (adminPasswordInput === ADMIN_PASSWORD) {
       setIsAdmin(true);
       setShowAdminModal(false);
     } else {
@@ -314,7 +324,6 @@ const ServiceSummaryApp = () => {
 
   return (
     <div className="min-h-screen p-4 md:p-6 transition-colors duration-300 relative" style={{ backgroundColor: '#F0F4F8', fontFamily: "'Kanit', sans-serif" }}>
-      {/* Link Font */}
       <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet" />
       
       {isLoading && (
@@ -337,7 +346,7 @@ const ServiceSummaryApp = () => {
             </div>
             <form onSubmit={handleLoginSubmit}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน (Default: admin)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">รหัสผ่าน</label>
                 <input
                   type="password"
                   value={adminPasswordInput}
