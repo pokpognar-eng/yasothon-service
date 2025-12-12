@@ -9,24 +9,6 @@ import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
 // ==========================================
 const ADMIN_PASSWORD = "qwerTyuiop1234"; 
 
-// ==========================================
-// ⚙️ ส่วนตั้งค่า Firebase (Configuration) - แก้ไขใหม่ให้เสถียรขึ้น
-// ==========================================
-let firebaseConfig;
-
-try {
-  // 1. พยายามดึงค่าอัตโนมัติ (สำหรับ Canvas)
-  // ตรวจสอบว่าตัวแปรมีอยู่จริงไหมก่อนเรียกใช้
-  if (typeof __firebase_config !== 'undefined') {
-    firebaseConfig = JSON.parse(__firebase_config);
-  }
-} catch (e) {
-  console.warn("Auto config failed, using manual config.");
-}
-
-// 2. ถ้าค่าว่าง หรือหาไม่เจอ ให้ใช้ค่าที่คุณกำหนดเอง (สำหรับ GitHub/Vercel)
-// ⚠️⚠️ แก้ไขตรงนี้: ใส่ค่า Config จริงของคุณที่ได้จาก Firebase Console ⚠️⚠️
-if (!firebaseConfig) {
 const firebaseConfig = {
   apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
   authDomain: "yasothon-service.firebaseapp.com",
@@ -36,6 +18,17 @@ const firebaseConfig = {
   appId: "1:848189212038:web:fb0f41ed30195941991807",
   measurementId: "G-NR3PGN2NG3"
 };
+// 2. พยายามดึงค่าอัตโนมัติ (เฉพาะตอนพรีวิวใน Canvas)
+try {
+  if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+    const canvasConfig = JSON.parse(__firebase_config);
+    // ถ้ามีค่าจาก Canvas ให้ใช้แทน (เพื่อให้คุณเล่นในหน้านี้ได้)
+    if (canvasConfig && canvasConfig.apiKey) {
+        firebaseConfig = canvasConfig;
+    }
+  }
+} catch (e) {
+  console.warn("Using manual config fallback.");
 }
 
 // ==========================================
