@@ -12,23 +12,12 @@ const ADMIN_PASSWORD = "qwerTyuiop1234"; // <--- เปลี่ยนรหั�
 // ==========================================
 // ส่วนตั้งค่า Firebase (แก้ไขตรงนี้ให้เป็นค่าของคุณ)
 // ==========================================
-const firebaseConfig = {
-  apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
-  authDomain: "yasothon-service.firebaseapp.com",
-  projectId: "yasothon-service",
-  storageBucket: "yasothon-service.firebasestorage.app",
-  messagingSenderId: "848189212038",
-  appId: "1:848189212038:web:fb0f41ed30195941991807",
-  measurementId: "G-NR3PGN2NG3"
-};
-
-// ==========================================
-// ส่วนเริ่มระบบ
-// ==========================================
+const firebaseConfig = JSON.parse(__firebase_config);
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// ใช้ appId จากระบบ หรือ default
 const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
 // ==========================================
@@ -43,6 +32,7 @@ const ServiceSummaryApp = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('');
+  const [errorMsg, setErrorMsg] = useState(''); // เพิ่ม state สำหรับแสดง Error
   
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAdminModal, setShowAdminModal] = useState(false);
@@ -70,7 +60,10 @@ const ServiceSummaryApp = () => {
     "หน่วยบริการเลิงนกทา"
   ];
 
-  // 1. Authentication
+  const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+  const currentThaiYear = selectedDate.getFullYear() + 543;
+
+  // 1. Authentication Setup
   useEffect(() => {
     const initAuth = async () => {
       try {
@@ -81,28 +74,41 @@ const ServiceSummaryApp = () => {
         }
       } catch (error) {
         console.error("Auth Error:", error);
+        setErrorMsg("ไม่สามารถเชื่อมต่อระบบสมาชิกได้");
       }
     };
     initAuth();
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        console.log("User Authenticated:", currentUser.uid);
+        setErrorMsg(''); // Clear error on success
+      }
     });
     return () => unsubscribe();
   }, []);
 
-  // 2. Data Syncing
+  // 2. Data Syncing (Updated Path Structure)
   const currentDocId = useMemo(() => {
     const m = selectedDate.getMonth();
     const y = selectedDate.getFullYear();
-    return `summary-shared-${y}-${m}`;
+    return `summary_${y}_${m}`; // Simplified ID
   }, [selectedDate]);
 
   useEffect(() => {
     if (!user) return;
+
     setIsLoading(true);
-    setLoadingMessage('กำลังซิงค์ข้อมูลส่วนกลาง...');
+    setLoadingMessage('กำลังเชื่อมต่อฐานข้อมูล...');
+    
+    // ใช้ Path Structure ที่ปลอดภัยที่สุด: /artifacts/{appId}/public/data/{collectionName}/{docId}
+    // Collection Name: 'service_summary'
+    const docPath = `artifacts/${appId}/public/data/service_summary/${currentDocId}`;
+    console.log("Connecting to Firestore Path:", docPath);
+
     try {
-      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'records', currentDocId);
+      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'service_summary', currentDocId);
+
       const unsubscribe = onSnapshot(docRef, (docSnap) => {
         if (docSnap.exists()) {
           const remoteData = docSnap.data().gridData || {};
@@ -111,17 +117,26 @@ const ServiceSummaryApp = () => {
           setData({});
         }
         setIsLoading(false);
+        setErrorMsg('');
       }, (error) => {
         console.error("Firestore Read Error:", error);
+        if (error.code === 'permission-denied') {
+           setErrorMsg("ไม่มีสิทธิ์เข้าถึงข้อมูล (Permission Denied) - กรุณารีเฟรชหน้าจอ");
+        } else {
+           setErrorMsg(`เกิดข้อผิดพลาดในการโหลดข้อมูล: ${error.message}`);
+        }
         setIsLoading(false);
       });
+
       return () => unsubscribe();
     } catch (err) {
       console.error("Error setting up listener:", err);
+      setErrorMsg("ไม่สามารถตั้งค่าการเชื่อมต่อได้");
       setIsLoading(false);
     }
   }, [user, currentDocId]);
 
+  // ... (Helper Functions are same) ...
   const simulateLoading = (message = 'กำลังประมวลผล...', duration = 800) => {
     setIsLoading(true);
     setLoadingMessage(message);
@@ -159,7 +174,6 @@ const ServiceSummaryApp = () => {
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
-    // ใช้รหัสผ่านจากตัวแปร ADMIN_PASSWORD ที่ตั้งไว้ข้างบน
     if (adminPasswordInput === ADMIN_PASSWORD) {
       setIsAdmin(true);
       setShowAdminModal(false);
@@ -180,7 +194,7 @@ const ServiceSummaryApp = () => {
     if (!user) return;
     setIsSaving(true);
     try {
-      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'records', currentDocId);
+      const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'service_summary', currentDocId);
       await setDoc(docRef, { 
         gridData: newData,
         lastUpdated: new Date(),
@@ -190,6 +204,7 @@ const ServiceSummaryApp = () => {
       }, { merge: true });
     } catch (error) {
       console.error("Save error:", error);
+      // alert("บันทึกไม่สำเร็จ: " + error.message);
     } finally {
       setIsSaving(false);
     }
@@ -239,12 +254,13 @@ const ServiceSummaryApp = () => {
       const emptyData = {};
       setData(emptyData);
       if (user) {
-        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'records', currentDocId);
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'service_summary', currentDocId);
         await setDoc(docRef, { gridData: emptyData }, { merge: true });
       }
     }
   };
 
+  // ... (Export/Import logic same) ...
   const exportToCSV = () => {
     let csvContent = "data:text/csv;charset=utf-8,\uFEFF"; 
     csvContent += "ที่,หน่วยบริการ," + days.map(d => `วันที่ ${d}`).join(",") + "\n";
@@ -302,7 +318,7 @@ const ServiceSummaryApp = () => {
         if (unitCount > 0) {
           setData(newData);
           if (user) {
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'records', currentDocId);
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'service_summary', currentDocId);
              setDoc(docRef, { gridData: newData, lastUpdated: new Date() }, { merge: true });
           }
           alert(`นำเข้าข้อมูลเรียบร้อย (${unitCount} หน่วยบริการ)\nข้อมูลถูกบันทึกขึ้นระบบกลางแล้ว`);
@@ -319,8 +335,12 @@ const ServiceSummaryApp = () => {
     reader.readAsText(file);
   };
 
-  const thaiMonths = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
-  const currentThaiYear = selectedDate.getFullYear() + 543;
+  const handlePrintPDF = () => {
+    const originalTitle = document.title;
+    document.title = `สรุปบริการ_${thaiMonths[selectedDate.getMonth()]}_${currentThaiYear}`;
+    window.print();
+    document.title = originalTitle;
+  };
 
   return (
     <div className="min-h-screen p-4 md:p-6 transition-colors duration-300 relative" style={{ backgroundColor: '#F0F4F8', fontFamily: "'Kanit', sans-serif" }}>
@@ -368,13 +388,13 @@ const ServiceSummaryApp = () => {
 
       <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".csv" className="hidden" />
 
-      <div className="max-w-[1600px] mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
+      <div className="max-w-[1600px] mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 print-container">
         <div className="p-6 md:p-8 text-white relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${colors.purple} 0%, #2c1a42 100%)` }}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#FBC02D]/10 rounded-full -ml-12 -mb-12 blur-xl"></div>
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div>
-              <div className="flex items-center gap-3 mb-2">
+              <div className="flex items-center gap-3 mb-2 print:hidden">
                 <span className="bg-[#FBC02D] text-[#4A2C6D] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
                    <Globe size={12} /> Public Database
                 </span>
@@ -389,14 +409,14 @@ const ServiceSummaryApp = () => {
                 )}
               </div>
               <h1 className="text-2xl md:text-3xl font-bold mb-2 text-shadow-sm">
-                🗓️ แบบสรุปการมารับบริการ (ออนไลน์)
+                🗓️ แบบสรุปการมารับบริการ
               </h1>
               <p className="text-white/80 font-light text-sm md:text-base flex items-center gap-2">
                 <CheckCircle2 size={16} className="text-[#FBC02D]" />
                 ศูนย์การศึกษาพิเศษ ประจำจังหวัดยโสธร
               </p>
             </div>
-            <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-lg flex flex-col sm:flex-row items-center gap-3">
+            <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-lg flex flex-col sm:flex-row items-center gap-3 print:hidden">
               <div className="flex items-center gap-2">
                 <Calendar className="text-[#FBC02D]" size={20} />
                 <span className="text-white/90 text-sm font-medium">ประจำเดือน:</span>
@@ -422,10 +442,21 @@ const ServiceSummaryApp = () => {
                 </div>
               </div>
             </div>
+            
+            <div className="hidden print:block text-right">
+                <h3 className="text-xl font-bold">ประจำเดือน {thaiMonths[selectedDate.getMonth()]} พ.ศ. {currentThaiYear}</h3>
+            </div>
           </div>
         </div>
 
-        <div className="bg-gray-50 border-b border-gray-200 p-4 flex flex-wrap justify-between items-center gap-4">
+        {errorMsg && (
+          <div className="bg-red-50 p-4 border-b border-red-200 flex items-center justify-center gap-2 text-red-600 print:hidden">
+            <AlertTriangle size={20} />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        <div className="bg-gray-50 border-b border-gray-200 p-4 flex flex-wrap justify-between items-center gap-4 print:hidden">
           <div className="flex items-center gap-2">
             <div className="px-4 py-2 bg-white border border-gray-200 rounded-xl shadow-sm flex items-center gap-2">
                <span className="w-3 h-3 rounded-full bg-[#D32F2F]"></span>
@@ -455,8 +486,8 @@ const ServiceSummaryApp = () => {
                 <button onClick={clearData} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white rounded-lg shadow-md hover:shadow-lg transform active:scale-95 transition-all" style={{ backgroundColor: colors.orange }}>
                   <Trash2 size={16} /> ล้าง
                 </button>
-                <button onClick={() => window.print()} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all">
-                  <Printer size={16} /> พิมพ์
+                <button onClick={handlePrintPDF} className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 hover:border-gray-300 transition-all">
+                  <Printer size={16} /> พิมพ์ / PDF
                 </button>
                </>
              ) : (
@@ -537,7 +568,7 @@ const ServiceSummaryApp = () => {
             </table>
           </div>
         </div>
-        <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500">
+        <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500 print:hidden">
           <div>ระบบฐานข้อมูลกลาง: Firestore (Google Cloud) | สถานะ: {user ? 'เชื่อมต่อสมบูรณ์' : 'กำลังเชื่อมต่อ...'}</div>
           <div className="flex gap-4">
              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#D32F2F]"></div> เสาร์-อาทิตย์</span>
@@ -545,8 +576,22 @@ const ServiceSummaryApp = () => {
           </div>
         </div>
       </div>
+      
+      <style>{`
+        @media print {
+          @page { size: landscape; margin: 5mm; }
+          body { background: white !important; font-family: 'Sarabun', sans-serif; -webkit-print-color-adjust: exact; }
+          .shadow-xl, .shadow-lg, .shadow-md { box-shadow: none !important; }
+          .rounded-3xl, .rounded-2xl, .rounded-xl { border-radius: 0 !important; }
+          button, .loading-overlay, input[type="file"], .admin-controls { display: none !important; }
+          .min-h-screen { padding: 0 !important; }
+          .max-w-[1600px] { max-width: 100% !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
+          .overflow-x-auto { overflow: visible !important; }
+          table { width: 100% !important; font-size: 10pt; }
+          input { border: none !important; text-align: center; background: transparent !important; padding: 0 !important; margin: 0 !important; width: auto !important; }
+          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+      `}</style>
     </div>
   );
 };
-
-export default ServiceSummaryApp;
