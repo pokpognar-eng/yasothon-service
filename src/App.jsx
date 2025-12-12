@@ -27,7 +27,7 @@ try {
 // 2. ถ้าค่าว่าง หรือหาไม่เจอ ให้ใช้ค่าที่คุณกำหนดเอง (สำหรับ GitHub/Vercel)
 // ⚠️⚠️ แก้ไขตรงนี้: ใส่ค่า Config จริงของคุณที่ได้จาก Firebase Console ⚠️⚠️
 if (!firebaseConfig) {
-  firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
   authDomain: "yasothon-service.firebaseapp.com",
   projectId: "yasothon-service",
@@ -35,7 +35,7 @@ if (!firebaseConfig) {
   messagingSenderId: "848189212038",
   appId: "1:848189212038:web:fb0f41ed30195941991807",
   measurementId: "G-NR3PGN2NG3"
-  };
+};
 }
 
 // ==========================================
