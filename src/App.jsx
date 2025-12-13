@@ -545,11 +545,11 @@ const ServiceSummaryApp = () => {
             <table className="w-full border-collapse min-w-[1200px] print:min-w-full print:text-[8px]">
               <thead>
                 <tr className="text-white" style={{ backgroundColor: colors.headerPurple }}>
-                  <th rowSpan="3" className="border-r border-white/20 p-2 w-10 text-sm font-medium rounded-tl-lg print:border-gray-400 print:text-white print-color-adjust print:text-[8px] print:p-1">ที่</th>
-                  <th rowSpan="3" className="border-r border-white/20 p-2 min-w-[200px] text-left text-sm font-medium print:border-gray-400 print:text-white print-color-adjust print:text-[8px] print:p-1 print:w-32">
+                  <th rowSpan="3" className="border-r border-white/20 p-2 w-10 text-sm font-medium rounded-tl-lg print:border print:border-black print:text-white print-color-adjust print:text-[8px] print:p-1">ที่</th>
+                  <th rowSpan="3" className="border-r border-white/20 p-2 min-w-[200px] text-left text-sm font-medium print:border print:border-black print:text-white print-color-adjust print:text-[8px] print:p-1 print:w-32">
                     🏢 รายชื่อหน่วยบริการ
                   </th>
-                  <th colSpan={days.length} className="p-1 text-center text-sm font-bold text-[#4A2C6D] relative print:text-black print:bg-[#FBC02D] print-color-adjust print:text-[9px] print:p-0" style={{ backgroundColor: colors.headerYellow }}>
+                  <th colSpan={days.length} className="p-1 text-center text-sm font-bold text-[#4A2C6D] relative print:text-black print:bg-[#FBC02D] print-color-adjust print:text-[9px] print:p-0 print:border print:border-black" style={{ backgroundColor: colors.headerYellow }}>
                      <span className="flex items-center justify-center gap-2">
                        📅 ตารางลงเวลาปฏิบัติงาน (วันที่ 1 - {days.length})
                      </span>
@@ -560,7 +560,7 @@ const ServiceSummaryApp = () => {
                     const { name, isWeekend } = getDayInfo(day);
                     return (
                       <th key={`dayname-${day}`} 
-                        className="p-0.5 text-[10px] text-center w-8 border-r border-white/10 print:border-gray-400 print:text-white print-color-adjust print:text-[7px] print:p-0" 
+                        className="p-0.5 text-[10px] text-center w-8 border-r border-white/10 print:border print:border-black print:text-white print-color-adjust print:text-[7px] print:p-0" 
                         style={{ backgroundColor: isWeekend ? colors.weekendRed : colors.weekdayGreen, color: 'white' }}
                       >
                         {name}
@@ -573,7 +573,7 @@ const ServiceSummaryApp = () => {
                     const { isWeekend } = getDayInfo(day);
                     return (
                       <th key={`datenum-${day}`} 
-                        className="p-0.5 text-xs text-center border-r border-white/10 font-light print:border-gray-400 print:text-white print-color-adjust print:text-[8px] print:p-0" 
+                        className="p-0.5 text-xs text-center border-r border-white/10 font-light print:border print:border-black print:text-white print-color-adjust print:text-[8px] print:p-0" 
                         style={{ backgroundColor: isWeekend ? colors.weekendRed : colors.weekdayGreen, color: 'white' }}
                       >
                         {day}
@@ -584,13 +584,13 @@ const ServiceSummaryApp = () => {
               </thead>
               <tbody>
                 {serviceUnits.map((unit, index) => (
-                  <tr key={index} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-300 print:border-gray-300">
-                    <td className="p-1 text-center text-xs font-bold text-gray-400 bg-gray-50 border-r border-gray-300 group-hover:bg-blue-100/30 print:text-black print:border-gray-400 print:text-[8px] print:p-0.5">{index + 1}</td>
-                    <td className="p-1 text-xs font-medium text-gray-700 border-r border-gray-300 group-hover:text-[#0288D1] transition-colors whitespace-nowrap print:text-black print:border-gray-400 print:text-[8px] print:p-0.5">{unit}</td>
+                  <tr key={index} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-300 print:border print:border-black">
+                    <td className="p-1 text-center text-xs font-bold text-gray-400 bg-gray-50 border-r border-gray-300 group-hover:bg-blue-100/30 print:text-black print:border print:border-black print:text-[8px] print:p-0.5">{index + 1}</td>
+                    <td className="p-1 text-xs font-medium text-gray-700 border-r border-gray-300 group-hover:text-[#0288D1] transition-colors whitespace-nowrap print:text-black print:border print:border-black print:text-[8px] print:p-0.5">{unit}</td>
                     {days.map(day => {
                       const { isWeekend } = getDayInfo(day);
                       return (
-                        <td key={day} className={`p-0 h-8 border-r border-gray-300 relative transition-colors ${isWeekend ? 'bg-red-50 print:bg-red-50' : ''} print:border-gray-400 print:h-5`}>
+                        <td key={day} className={`p-0 h-8 border-r border-gray-300 relative transition-colors ${isWeekend ? 'bg-red-50 print:bg-red-50' : ''} print:border print:border-black print:h-5`}>
                           <input 
                             type="text" 
                             maxLength={3} 
@@ -610,10 +610,10 @@ const ServiceSummaryApp = () => {
               </tbody>
               <tfoot>
                 <tr className="shadow-lg relative z-10 print:shadow-none" style={{ backgroundColor: '#E3F2FD' }}>
-                  <td colSpan="2" className="p-2 text-right font-bold text-xs text-[#0288D1] border-r border-blue-300 print:text-black print:border-gray-400 print:text-[8px] print:p-1">📊 รวมยอดรายวัน</td>
+                  <td colSpan="2" className="p-2 text-right font-bold text-xs text-[#0288D1] border-r border-blue-300 print:text-black print:border print:border-black print:text-[8px] print:p-1">📊 รวมยอดรายวัน</td>
                   {days.map(day => {
                      const total = calculateDailyTotal(day);
-                     return <td key={`total-${day}`} className="p-1 text-center text-xs font-bold text-[#0288D1] border-r border-blue-300 bg-blue-50 print:text-black print:bg-gray-100 print:border-gray-400 print:text-[8px] print:p-0">{total > 0 && <span className="inline-block px-1 py-0.5 rounded bg-[#0288D1] text-white text-[10px] shadow-sm print:bg-transparent print:text-black print:shadow-none print:p-0">{total}</span>}</td>;
+                     return <td key={`total-${day}`} className="p-1 text-center text-xs font-bold text-[#0288D1] border-r border-blue-300 bg-blue-50 print:text-black print:bg-gray-100 print:border print:border-black print:text-[8px] print:p-0">{total > 0 && <span className="inline-block px-1 py-0.5 rounded bg-[#0288D1] text-white text-[10px] shadow-sm print:bg-transparent print:text-black print:shadow-none print:p-0">{total}</span>}</td>;
                   })}
                 </tr>
               </tfoot>
@@ -662,8 +662,11 @@ const ServiceSummaryApp = () => {
           .overflow-x-auto { overflow: visible !important; }
           
           /* Table Adjustments for Print */
-          table { width: 100% !important; font-size: 8px !important; table-layout: fixed; }
+          table { width: 100% !important; font-size: 8px !important; table-layout: fixed; border-collapse: collapse !important; }
           th, td { border: 1px solid #000 !important; }
+          
+          /* Ensure header cells specifically have black borders */
+          thead th { border: 1px solid #000 !important; }
           
           input { 
             border: none !important; 
