@@ -64,12 +64,12 @@ const ServiceSummaryApp = () => {
   
   const fileInputRef = useRef(null);
 
+  // Theme Colors matching the image provided
   const colors = {
-    purple: '#4A2C6D',
-    red: '#D32F2F',
-    orange: '#F57C00',
-    yellow: '#FBC02D',
-    blue: '#0288D1',
+    headerPurple: '#4A2C6D', // ม่วงเข้มหัวตารางซ้าย
+    headerYellow: '#FBC02D', // เหลืองหัวตารางขวา
+    weekendRed: '#D32F2F',   // แดงวันหยุด
+    weekdayGreen: '#4CAF50', // เขียววันธรรมดา
     bg: '#F3F4F6'
   };
 
@@ -410,10 +410,12 @@ const ServiceSummaryApp = () => {
       <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".csv" className="hidden" />
 
       <div className="max-w-[1600px] mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 print-container">
-        <div className="p-6 md:p-8 text-white relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${colors.purple} 0%, #2c1a42 100%)` }}>
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#FBC02D]/10 rounded-full -ml-12 -mb-12 blur-xl"></div>
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        
+        {/* Header - Purple section based on uploaded image */}
+        <div className="p-6 md:p-8 text-white relative overflow-hidden print:p-0 print:overflow-visible" style={{ background: `linear-gradient(135deg, ${colors.headerPurple} 0%, #2c1a42 100%)` }}>
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl print:hidden"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#FBC02D]/10 rounded-full -ml-12 -mb-12 blur-xl print:hidden"></div>
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 print:flex-row print:items-end print:pb-4 print:border-b print:border-gray-200">
             <div>
               <div className="flex items-center gap-3 mb-2 print:hidden">
                 <span className="bg-[#FBC02D] text-[#4A2C6D] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
@@ -429,14 +431,15 @@ const ServiceSummaryApp = () => {
                   </span>
                 )}
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2 text-shadow-sm">
+              <h1 className="text-2xl md:text-3xl font-bold mb-2 text-shadow-sm print:text-black print:text-xl print:mb-0">
                 🗓️ แบบสรุปการมารับบริการ
               </h1>
-              <p className="text-white/80 font-light text-sm md:text-base flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-[#FBC02D]" />
+              <p className="text-white/80 font-light text-sm md:text-base flex items-center gap-2 print:text-gray-600 print:text-sm">
+                <CheckCircle2 size={16} className="text-[#FBC02D] print:hidden" />
                 ศูนย์การศึกษาพิเศษ ประจำจังหวัดยโสธร
               </p>
             </div>
+            
             <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-lg flex flex-col sm:flex-row items-center gap-3 print:hidden">
               <div className="flex items-center gap-2">
                 <Calendar className="text-[#FBC02D]" size={20} />
@@ -465,7 +468,7 @@ const ServiceSummaryApp = () => {
             </div>
             
             <div className="hidden print:block text-right">
-                <h3 className="text-xl font-bold">ประจำเดือน {thaiMonths[selectedDate.getMonth()]} พ.ศ. {currentThaiYear}</h3>
+                <h3 className="text-lg font-bold text-gray-800">ประจำเดือน {thaiMonths[selectedDate.getMonth()]} พ.ศ. {currentThaiYear}</h3>
             </div>
           </div>
         </div>
@@ -529,16 +532,17 @@ const ServiceSummaryApp = () => {
           </div>
         </div>
 
-        <div className="p-4 bg-white">
-          <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-inner custom-scrollbar pb-2">
-            <table className="w-full border-collapse min-w-[1200px]">
+        <div className="p-4 bg-white print:p-0">
+          <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-inner custom-scrollbar pb-2 print:border-none print:shadow-none print:overflow-visible">
+            <table className="w-full border-collapse min-w-[1200px] print:min-w-full">
               <thead>
-                <tr className="text-white" style={{ backgroundColor: colors.purple }}>
-                  <th rowSpan="3" className="border-r border-white/20 p-3 w-14 text-sm font-medium rounded-tl-lg">ที่</th>
-                  <th rowSpan="3" className="border-r border-white/20 p-3 min-w-[220px] text-left text-sm font-medium">
+                {/* Header structure matching vv.png */}
+                <tr className="text-white" style={{ backgroundColor: colors.headerPurple }}>
+                  <th rowSpan="3" className="border-r border-white/20 p-2 w-10 text-sm font-medium rounded-tl-lg print:border-gray-300 print:text-white print-color-adjust">ที่</th>
+                  <th rowSpan="3" className="border-r border-white/20 p-2 min-w-[200px] text-left text-sm font-medium print:border-gray-300 print:text-white print-color-adjust">
                     🏢 รายชื่อหน่วยบริการ
                   </th>
-                  <th colSpan={days.length} className="p-2 text-center text-sm font-bold text-[#4A2C6D] relative" style={{ backgroundColor: colors.yellow }}>
+                  <th colSpan={days.length} className="p-1 text-center text-sm font-bold text-[#4A2C6D] relative print:text-black print:bg-[#FBC02D] print-color-adjust" style={{ backgroundColor: colors.headerYellow }}>
                      <span className="flex items-center justify-center gap-2">
                        📅 ตารางลงเวลาปฏิบัติงาน (วันที่ 1 - {days.length})
                      </span>
@@ -548,7 +552,12 @@ const ServiceSummaryApp = () => {
                   {days.map(day => {
                     const { name, isWeekend } = getDayInfo(day);
                     return (
-                      <th key={`dayname-${day}`} className="p-1 text-[10px] text-center w-9 border-r border-white/10" style={{ backgroundColor: isWeekend ? colors.red : '#2E7D32', color: 'white' }}>{name}</th>
+                      <th key={`dayname-${day}`} 
+                        className="p-0.5 text-[10px] text-center w-8 border-r border-white/10 print:border-gray-300 print:text-white print-color-adjust" 
+                        style={{ backgroundColor: isWeekend ? colors.weekendRed : colors.weekdayGreen, color: 'white' }}
+                      >
+                        {name}
+                      </th>
                     );
                   })}
                 </tr>
@@ -556,21 +565,36 @@ const ServiceSummaryApp = () => {
                   {days.map(day => {
                     const { isWeekend } = getDayInfo(day);
                     return (
-                      <th key={`datenum-${day}`} className="p-1 text-sm text-center border-r border-white/10 font-light" style={{ backgroundColor: isWeekend ? colors.red : '#4CAF50', color: 'white' }}>{day}</th>
+                      <th key={`datenum-${day}`} 
+                        className="p-0.5 text-xs text-center border-r border-white/10 font-light print:border-gray-300 print:text-white print-color-adjust" 
+                        style={{ backgroundColor: isWeekend ? colors.weekendRed : colors.weekdayGreen, color: 'white' }}
+                      >
+                        {day}
+                      </th>
                     );
                   })}
                 </tr>
               </thead>
               <tbody>
                 {serviceUnits.map((unit, index) => (
-                  <tr key={index} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-100">
-                    <td className="p-2 text-center text-sm font-bold text-gray-400 bg-gray-50 border-r border-gray-200 group-hover:bg-blue-100/30">{index + 1}</td>
-                    <td className="p-2 text-sm font-medium text-gray-700 border-r border-gray-200 group-hover:text-[#0288D1] transition-colors whitespace-nowrap">{unit}</td>
+                  <tr key={index} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-100 print:border-gray-300">
+                    <td className="p-1 text-center text-xs font-bold text-gray-400 bg-gray-50 border-r border-gray-200 group-hover:bg-blue-100/30 print:text-black print:border-gray-300">{index + 1}</td>
+                    <td className="p-1 text-xs font-medium text-gray-700 border-r border-gray-200 group-hover:text-[#0288D1] transition-colors whitespace-nowrap print:text-black print:border-gray-300">{unit}</td>
                     {days.map(day => {
                       const { isWeekend } = getDayInfo(day);
                       return (
-                        <td key={day} className={`p-0 h-10 border-r border-gray-100 relative transition-colors ${isWeekend ? 'bg-red-50' : ''}`}>
-                          <input type="text" maxLength={3} placeholder={isWeekend ? "-" : ""} value={data[`${index}-${day}`] || ''} onChange={(e) => handleInputChange(index, day, e.target.value)} className={`input-cell w-full h-full text-center text-sm bg-transparent outline-none transition-all duration-200 ${isWeekend ? 'text-red-500 placeholder-red-200 font-medium' : 'text-gray-700 font-bold hover:bg-blue-50 focus:bg-white'}`}/>
+                        <td key={day} className={`p-0 h-8 border-r border-gray-100 relative transition-colors ${isWeekend ? 'bg-red-50 print:bg-red-50' : ''} print:border-gray-300`}>
+                          <input 
+                            type="text" 
+                            maxLength={3} 
+                            placeholder={isWeekend ? "-" : ""} 
+                            value={data[`${index}-${day}`] || ''} 
+                            onChange={(e) => handleInputChange(index, day, e.target.value)} 
+                            className={`input-cell w-full h-full text-center text-xs bg-transparent outline-none transition-all duration-200 
+                              ${isWeekend ? 'text-red-500 placeholder-red-200 font-medium' : 'text-gray-700 font-bold hover:bg-blue-50 focus:bg-white'}
+                              print:text-black
+                            `}
+                          />
                         </td>
                       );
                     })}
@@ -578,11 +602,11 @@ const ServiceSummaryApp = () => {
                 ))}
               </tbody>
               <tfoot>
-                <tr className="shadow-lg relative z-10" style={{ backgroundColor: '#E3F2FD' }}>
-                  <td colSpan="2" className="p-3 text-right font-bold text-sm text-[#0288D1] border-r border-blue-200">📊 รวมยอดรายวัน</td>
+                <tr className="shadow-lg relative z-10 print:shadow-none" style={{ backgroundColor: '#E3F2FD' }}>
+                  <td colSpan="2" className="p-2 text-right font-bold text-xs text-[#0288D1] border-r border-blue-200 print:text-black print:border-gray-300">📊 รวมยอดรายวัน</td>
                   {days.map(day => {
                      const total = calculateDailyTotal(day);
-                     return <td key={`total-${day}`} className="p-2 text-center text-sm font-bold text-[#0288D1] border-r border-blue-200 bg-blue-50">{total > 0 && <span className="inline-block px-1.5 py-0.5 rounded bg-[#0288D1] text-white text-xs shadow-sm">{total}</span>}</td>;
+                     return <td key={`total-${day}`} className="p-1 text-center text-xs font-bold text-[#0288D1] border-r border-blue-200 bg-blue-50 print:text-black print:bg-gray-100 print:border-gray-300">{total > 0 && <span className="inline-block px-1 py-0.5 rounded bg-[#0288D1] text-white text-[10px] shadow-sm print:bg-transparent print:text-black print:shadow-none">{total}</span>}</td>;
                   })}
                 </tr>
               </tfoot>
@@ -590,13 +614,13 @@ const ServiceSummaryApp = () => {
           </div>
         </div>
 
-        {/* Signature Block - Print Only */}
-        <div className="hidden print:flex justify-end mt-10 mr-10 break-inside-avoid">
-          <div className="text-center w-64">
-            <p className="mb-2">(................................................)</p>
-            <p className="font-bold">นายณรงค์ฤทธิ์ ปกป้อง</p>
-            <p>นายทะเบียนนักเรียน</p>
-            <p>ผู้รายงานข้อมูล</p>
+        {/* Signature Block - Print Only - Bottom Right */}
+        <div className="hidden print:flex justify-end mt-8 mr-4 break-inside-avoid">
+          <div className="text-center w-auto pr-8">
+            <p className="mb-4 text-sm font-medium">(................................................)</p>
+            <p className="font-bold text-sm">นายณรงค์ฤทธิ์ ปกป้อง</p>
+            <p className="text-sm">นายทะเบียนนักเรียน</p>
+            <p className="text-sm">ผู้รายงานข้อมูล</p>
           </div>
         </div>
 
@@ -613,17 +637,33 @@ const ServiceSummaryApp = () => {
       
       <style>{`
         @media print {
-          @page { size: landscape; margin: 5mm; }
-          body { background: white !important; font-family: 'Sarabun', sans-serif; -webkit-print-color-adjust: exact; }
+          @page { 
+            size: A4 landscape; 
+            margin: 5mm; 
+          }
+          body { 
+            background: white !important; 
+            font-family: 'Sarabun', sans-serif; 
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
           .shadow-xl, .shadow-lg, .shadow-md { box-shadow: none !important; }
-          .rounded-3xl, .rounded-2xl, .rounded-xl { border-radius: 0 !important; }
-          button, .loading-overlay, input[type="file"], .admin-controls { display: none !important; }
-          .min-h-screen { padding: 0 !important; }
-          .max-w-[1600px] { max-width: 100% !important; margin: 0 !important; box-shadow: none !important; border: none !important; }
+          .rounded-3xl, .rounded-2xl, .rounded-xl, .rounded-tl-lg { border-radius: 0 !important; }
+          button, .loading-overlay, input[type="file"], .admin-controls, select { display: none !important; }
+          .min-h-screen { padding: 0 !important; margin: 0 !important; }
+          .max-w-[1600px] { max-width: 100% !important; margin: 0 !important; box-shadow: none !important; border: none !important; width: 100% !important; }
           .overflow-x-auto { overflow: visible !important; }
-          table { width: 100% !important; font-size: 10pt; }
-          input { border: none !important; text-align: center; background: transparent !important; padding: 0 !important; margin: 0 !important; width: auto !important; }
-          * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+          table { width: 100% !important; font-size: 9pt; table-layout: fixed; }
+          th, td { border: 1px solid #ccc !important; }
+          input { border: none !important; text-align: center; background: transparent !important; padding: 0 !important; margin: 0 !important; width: 100% !important; height: auto !important; font-size: 9pt !important; }
+          
+          /* Force Background Colors */
+          .bg-red-50 { background-color: #fef2f2 !important; }
+          
+          /* Hide non-print elements explicitly */
+          .print\\:hidden { display: none !important; }
+          .print\\:block { display: block !important; }
+          .print\\:flex { display: flex !important; }
         }
       `}</style>
     </div>
