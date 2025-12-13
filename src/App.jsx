@@ -22,7 +22,6 @@ try {
   console.warn("Using manual config fallback");
   
   // ⚠️⚠️ แก้ไขตรงนี้: ใส่ค่า Config จริงของคุณที่ได้จาก Firebase Console ⚠️⚠️
-  // (ให้แน่ใจว่าลบ const firebaseConfig = { ... } ที่ก๊อปมาออก ให้เหลือแค่ตัวแปรข้างใน)
   firebaseConfig = {
   apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
   authDomain: "yasothon-service.firebaseapp.com",
@@ -64,13 +63,18 @@ const ServiceSummaryApp = () => {
   
   const fileInputRef = useRef(null);
 
-  // Theme Colors matching the image provided
+  // Theme Colors
   const colors = {
     headerPurple: '#4A2C6D', // ม่วงเข้มหัวตารางซ้าย
     headerYellow: '#FBC02D', // เหลืองหัวตารางขวา
     weekendRed: '#D32F2F',   // แดงวันหยุด
     weekdayGreen: '#4CAF50', // เขียววันธรรมดา
-    bg: '#F3F4F6'
+    bg: '#F3F4F6',
+    // คืนค่าสีปุ่มที่เคยหายไป
+    blue: '#0288D1', 
+    orange: '#F57C00',
+    purple: '#4A2C6D',
+    red: '#D32F2F'
   };
 
   const serviceUnits = [
@@ -411,11 +415,11 @@ const ServiceSummaryApp = () => {
 
       <div className="max-w-[1600px] mx-auto bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 print-container">
         
-        {/* Header - Purple section based on uploaded image */}
+        {/* Header - Purple section */}
         <div className="p-6 md:p-8 text-white relative overflow-hidden print:p-0 print:overflow-visible" style={{ background: `linear-gradient(135deg, ${colors.headerPurple} 0%, #2c1a42 100%)` }}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl print:hidden"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#FBC02D]/10 rounded-full -ml-12 -mb-12 blur-xl print:hidden"></div>
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 print:flex-row print:items-end print:pb-4 print:border-b print:border-gray-200">
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 print:flex-row print:items-end print:pb-2 print:border-b print:border-gray-200">
             <div>
               <div className="flex items-center gap-3 mb-2 print:hidden">
                 <span className="bg-[#FBC02D] text-[#4A2C6D] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
@@ -431,10 +435,10 @@ const ServiceSummaryApp = () => {
                   </span>
                 )}
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2 text-shadow-sm print:text-black print:text-xl print:mb-0">
+              <h1 className="text-2xl md:text-3xl font-bold mb-2 text-shadow-sm print:text-black print:text-lg print:mb-0 print:leading-tight">
                 🗓️ แบบสรุปการมารับบริการ
               </h1>
-              <p className="text-white/80 font-light text-sm md:text-base flex items-center gap-2 print:text-gray-600 print:text-sm">
+              <p className="text-white/80 font-light text-sm md:text-base flex items-center gap-2 print:text-gray-600 print:text-xs print:mt-1">
                 <CheckCircle2 size={16} className="text-[#FBC02D] print:hidden" />
                 ศูนย์การศึกษาพิเศษ ประจำจังหวัดยโสธร
               </p>
@@ -468,7 +472,7 @@ const ServiceSummaryApp = () => {
             </div>
             
             <div className="hidden print:block text-right">
-                <h3 className="text-lg font-bold text-gray-800">ประจำเดือน {thaiMonths[selectedDate.getMonth()]} พ.ศ. {currentThaiYear}</h3>
+                <h3 className="text-sm font-bold text-gray-800">ประจำเดือน {thaiMonths[selectedDate.getMonth()]} พ.ศ. {currentThaiYear}</h3>
             </div>
           </div>
         </div>
@@ -534,15 +538,14 @@ const ServiceSummaryApp = () => {
 
         <div className="p-4 bg-white print:p-0">
           <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-inner custom-scrollbar pb-2 print:border-none print:shadow-none print:overflow-visible">
-            <table className="w-full border-collapse min-w-[1200px] print:min-w-full">
+            <table className="w-full border-collapse min-w-[1200px] print:min-w-full print:text-[8px]">
               <thead>
-                {/* Header structure matching vv.png */}
                 <tr className="text-white" style={{ backgroundColor: colors.headerPurple }}>
-                  <th rowSpan="3" className="border-r border-white/20 p-2 w-10 text-sm font-medium rounded-tl-lg print:border-gray-300 print:text-white print-color-adjust">ที่</th>
-                  <th rowSpan="3" className="border-r border-white/20 p-2 min-w-[200px] text-left text-sm font-medium print:border-gray-300 print:text-white print-color-adjust">
+                  <th rowSpan="3" className="border-r border-white/20 p-2 w-10 text-sm font-medium rounded-tl-lg print:border-gray-400 print:text-white print-color-adjust print:text-[8px] print:p-1">ที่</th>
+                  <th rowSpan="3" className="border-r border-white/20 p-2 min-w-[200px] text-left text-sm font-medium print:border-gray-400 print:text-white print-color-adjust print:text-[8px] print:p-1 print:w-32">
                     🏢 รายชื่อหน่วยบริการ
                   </th>
-                  <th colSpan={days.length} className="p-1 text-center text-sm font-bold text-[#4A2C6D] relative print:text-black print:bg-[#FBC02D] print-color-adjust" style={{ backgroundColor: colors.headerYellow }}>
+                  <th colSpan={days.length} className="p-1 text-center text-sm font-bold text-[#4A2C6D] relative print:text-black print:bg-[#FBC02D] print-color-adjust print:text-[9px] print:p-0" style={{ backgroundColor: colors.headerYellow }}>
                      <span className="flex items-center justify-center gap-2">
                        📅 ตารางลงเวลาปฏิบัติงาน (วันที่ 1 - {days.length})
                      </span>
@@ -553,7 +556,7 @@ const ServiceSummaryApp = () => {
                     const { name, isWeekend } = getDayInfo(day);
                     return (
                       <th key={`dayname-${day}`} 
-                        className="p-0.5 text-[10px] text-center w-8 border-r border-white/10 print:border-gray-300 print:text-white print-color-adjust" 
+                        className="p-0.5 text-[10px] text-center w-8 border-r border-white/10 print:border-gray-400 print:text-white print-color-adjust print:text-[7px] print:p-0" 
                         style={{ backgroundColor: isWeekend ? colors.weekendRed : colors.weekdayGreen, color: 'white' }}
                       >
                         {name}
@@ -566,7 +569,7 @@ const ServiceSummaryApp = () => {
                     const { isWeekend } = getDayInfo(day);
                     return (
                       <th key={`datenum-${day}`} 
-                        className="p-0.5 text-xs text-center border-r border-white/10 font-light print:border-gray-300 print:text-white print-color-adjust" 
+                        className="p-0.5 text-xs text-center border-r border-white/10 font-light print:border-gray-400 print:text-white print-color-adjust print:text-[8px] print:p-0" 
                         style={{ backgroundColor: isWeekend ? colors.weekendRed : colors.weekdayGreen, color: 'white' }}
                       >
                         {day}
@@ -578,12 +581,12 @@ const ServiceSummaryApp = () => {
               <tbody>
                 {serviceUnits.map((unit, index) => (
                   <tr key={index} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-100 print:border-gray-300">
-                    <td className="p-1 text-center text-xs font-bold text-gray-400 bg-gray-50 border-r border-gray-200 group-hover:bg-blue-100/30 print:text-black print:border-gray-300">{index + 1}</td>
-                    <td className="p-1 text-xs font-medium text-gray-700 border-r border-gray-200 group-hover:text-[#0288D1] transition-colors whitespace-nowrap print:text-black print:border-gray-300">{unit}</td>
+                    <td className="p-1 text-center text-xs font-bold text-gray-400 bg-gray-50 border-r border-gray-200 group-hover:bg-blue-100/30 print:text-black print:border-gray-400 print:text-[8px] print:p-0.5">{index + 1}</td>
+                    <td className="p-1 text-xs font-medium text-gray-700 border-r border-gray-200 group-hover:text-[#0288D1] transition-colors whitespace-nowrap print:text-black print:border-gray-400 print:text-[8px] print:p-0.5">{unit}</td>
                     {days.map(day => {
                       const { isWeekend } = getDayInfo(day);
                       return (
-                        <td key={day} className={`p-0 h-8 border-r border-gray-100 relative transition-colors ${isWeekend ? 'bg-red-50 print:bg-red-50' : ''} print:border-gray-300`}>
+                        <td key={day} className={`p-0 h-8 border-r border-gray-100 relative transition-colors ${isWeekend ? 'bg-red-50 print:bg-red-50' : ''} print:border-gray-400 print:h-5`}>
                           <input 
                             type="text" 
                             maxLength={3} 
@@ -592,7 +595,7 @@ const ServiceSummaryApp = () => {
                             onChange={(e) => handleInputChange(index, day, e.target.value)} 
                             className={`input-cell w-full h-full text-center text-xs bg-transparent outline-none transition-all duration-200 
                               ${isWeekend ? 'text-red-500 placeholder-red-200 font-medium' : 'text-gray-700 font-bold hover:bg-blue-50 focus:bg-white'}
-                              print:text-black
+                              print:text-black print:text-[8px] print:h-full print:leading-none
                             `}
                           />
                         </td>
@@ -603,10 +606,10 @@ const ServiceSummaryApp = () => {
               </tbody>
               <tfoot>
                 <tr className="shadow-lg relative z-10 print:shadow-none" style={{ backgroundColor: '#E3F2FD' }}>
-                  <td colSpan="2" className="p-2 text-right font-bold text-xs text-[#0288D1] border-r border-blue-200 print:text-black print:border-gray-300">📊 รวมยอดรายวัน</td>
+                  <td colSpan="2" className="p-2 text-right font-bold text-xs text-[#0288D1] border-r border-blue-200 print:text-black print:border-gray-400 print:text-[8px] print:p-1">📊 รวมยอดรายวัน</td>
                   {days.map(day => {
                      const total = calculateDailyTotal(day);
-                     return <td key={`total-${day}`} className="p-1 text-center text-xs font-bold text-[#0288D1] border-r border-blue-200 bg-blue-50 print:text-black print:bg-gray-100 print:border-gray-300">{total > 0 && <span className="inline-block px-1 py-0.5 rounded bg-[#0288D1] text-white text-[10px] shadow-sm print:bg-transparent print:text-black print:shadow-none">{total}</span>}</td>;
+                     return <td key={`total-${day}`} className="p-1 text-center text-xs font-bold text-[#0288D1] border-r border-blue-200 bg-blue-50 print:text-black print:bg-gray-100 print:border-gray-400 print:text-[8px] print:p-0">{total > 0 && <span className="inline-block px-1 py-0.5 rounded bg-[#0288D1] text-white text-[10px] shadow-sm print:bg-transparent print:text-black print:shadow-none print:p-0">{total}</span>}</td>;
                   })}
                 </tr>
               </tfoot>
@@ -615,12 +618,12 @@ const ServiceSummaryApp = () => {
         </div>
 
         {/* Signature Block - Print Only - Bottom Right */}
-        <div className="hidden print:flex justify-end mt-8 mr-4 break-inside-avoid">
-          <div className="text-center w-auto pr-8">
-            <p className="mb-4 text-sm font-medium">(................................................)</p>
-            <p className="font-bold text-sm">นายณรงค์ฤทธิ์ ปกป้อง</p>
-            <p className="text-sm">นายทะเบียนนักเรียน</p>
-            <p className="text-sm">ผู้รายงานข้อมูล</p>
+        <div className="hidden print:flex justify-end mt-4 mr-4 break-inside-avoid">
+          <div className="text-center w-auto pr-4">
+            <p className="mb-2 text-[10px] font-medium">(................................................)</p>
+            <p className="font-bold text-[10px]">นายณรงค์ฤทธิ์ ปกป้อง</p>
+            <p className="text-[10px]">นายทะเบียนนักเรียน</p>
+            <p className="text-[10px]">ผู้รายงานข้อมูล</p>
           </div>
         </div>
 
@@ -653,9 +656,12 @@ const ServiceSummaryApp = () => {
           .min-h-screen { padding: 0 !important; margin: 0 !important; }
           .max-w-[1600px] { max-width: 100% !important; margin: 0 !important; box-shadow: none !important; border: none !important; width: 100% !important; }
           .overflow-x-auto { overflow: visible !important; }
-          table { width: 100% !important; font-size: 9pt; table-layout: fixed; }
-          th, td { border: 1px solid #ccc !important; }
-          input { border: none !important; text-align: center; background: transparent !important; padding: 0 !important; margin: 0 !important; width: 100% !important; height: auto !important; font-size: 9pt !important; }
+          
+          /* Table Adjustments for Print */
+          table { width: 100% !important; font-size: 8px !important; table-layout: fixed; }
+          th, td { border: 1px solid #999 !important; }
+          
+          input { border: none !important; text-align: center; background: transparent !important; padding: 0 !important; margin: 0 !important; width: 100% !important; height: auto !important; font-size: 8px !important; }
           
           /* Force Background Colors */
           .bg-red-50 { background-color: #fef2f2 !important; }
