@@ -65,10 +65,10 @@ const ServiceSummaryApp = () => {
 
   // Theme Colors
   const colors = {
-    headerPurple: '#4A2C6D', // ม่วงเข้มหัวตารางซ้าย
-    headerYellow: '#FBC02D', // เหลืองหัวตารางขวา
-    weekendRed: '#D32F2F',   // แดงวันหยุด
-    weekdayGreen: '#4CAF50', // เขียววันธรรมดา
+    headerPurple: '#4A2C6D',
+    headerYellow: '#FBC02D',
+    weekendRed: '#D32F2F',
+    weekdayGreen: '#4CAF50',
     bg: '#F3F4F6',
     blue: '#0288D1', 
     orange: '#F57C00',
@@ -418,9 +418,10 @@ const ServiceSummaryApp = () => {
         <div className="p-6 md:p-8 text-white relative overflow-hidden print:p-0 print:overflow-visible" style={{ background: `linear-gradient(135deg, ${colors.headerPurple} 0%, #2c1a42 100%)` }}>
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-16 -mt-16 blur-2xl print:hidden"></div>
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#FBC02D]/10 rounded-full -ml-12 -mb-12 blur-xl print:hidden"></div>
-          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 print:flex-row print:items-end print:pb-2 print:border-b print:border-gray-200">
+          
+          <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 print:hidden">
             <div>
-              <div className="flex items-center gap-3 mb-2 print:hidden">
+              <div className="flex items-center gap-3 mb-2">
                 <span className="bg-[#FBC02D] text-[#4A2C6D] text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
                    <Globe size={12} /> Public Database
                 </span>
@@ -434,16 +435,16 @@ const ServiceSummaryApp = () => {
                   </span>
                 )}
               </div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2 text-shadow-sm print:text-black print:text-lg print:mb-0 print:leading-tight">
-                🗓️ แบบสรุปการมารับบริการ
+              <h1 className="text-2xl md:text-3xl font-bold mb-2 text-shadow-sm">
+                🗓️ แบบสรุปการมารับบริการ หน่วยบริการ
               </h1>
-              <p className="text-white/80 font-light text-sm md:text-base flex items-center gap-2 print:text-gray-600 print:text-xs print:mt-1">
-                <CheckCircle2 size={16} className="text-[#FBC02D] print:hidden" />
+              <p className="text-white/80 font-light text-sm md:text-base flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-[#FBC02D]" />
                 ศูนย์การศึกษาพิเศษ ประจำจังหวัดยโสธร
               </p>
             </div>
             
-            <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-lg flex flex-col sm:flex-row items-center gap-3 print:hidden">
+            <div className="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/20 shadow-lg flex flex-col sm:flex-row items-center gap-3">
               <div className="flex items-center gap-2">
                 <Calendar className="text-[#FBC02D]" size={20} />
                 <span className="text-white/90 text-sm font-medium">ประจำเดือน:</span>
@@ -469,10 +470,14 @@ const ServiceSummaryApp = () => {
                 </div>
               </div>
             </div>
-            
-            <div className="hidden print:block text-right">
-                <h3 className="text-sm font-bold text-gray-800">ประจำเดือน {thaiMonths[selectedDate.getMonth()]} พ.ศ. {currentThaiYear}</h3>
-            </div>
+          </div>
+
+          {/* Dedicated Print Header - Visible only when printing */}
+          <div className="hidden print:block text-center text-black mb-4">
+            <h1 className="text-2xl font-bold mb-2 text-black">แบบสรุปการมารับบริการ หน่วยบริการ</h1>
+            <h2 className="text-xl font-bold text-black">
+              ศูนย์การศึกษาพิเศษ ประจำ จังหวัดยโสธร ประจำ เดือน {thaiMonths[selectedDate.getMonth()]} พ.ศ. {currentThaiYear}
+            </h2>
           </div>
         </div>
 
