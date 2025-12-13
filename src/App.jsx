@@ -661,13 +661,30 @@ const ServiceSummaryApp = () => {
           .max-w-[1600px] { max-width: 100% !important; margin: 0 !important; box-shadow: none !important; border: none !important; width: 100% !important; }
           .overflow-x-auto { overflow: visible !important; }
           
-          /* Table Adjustments for Print */
-          table { width: 100% !important; font-size: 8px !important; table-layout: fixed; border-collapse: collapse !important; }
-          th, td { border: 1px solid #000 !important; }
+          /* Table Adjustments for Print - Explicit Borders */
+          table { 
+            width: 100% !important; 
+            font-size: 8px !important; 
+            table-layout: fixed; 
+            border-collapse: collapse !important; 
+            border: 1px solid #000 !important;
+          }
           
-          /* Ensure header cells specifically have black borders */
-          thead th { border: 1px solid #000 !important; }
+          th, td { 
+            border: 1px solid #000 !important; 
+          }
           
+          /* Specific overrides for cells to ensure black borders */
+          .print\\:border-black {
+            border: 1px solid #000 !important;
+          }
+          
+          /* Override tailwind border-r etc if they cause double borders or gaps, but with collapse it should be fine. 
+             Ideally force all sides. */
+          thead th, tbody td, tfoot td {
+            border: 1px solid #000 !important;
+          }
+
           input { 
             border: none !important; 
             text-align: center; 
