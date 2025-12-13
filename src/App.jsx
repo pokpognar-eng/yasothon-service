@@ -19,10 +19,11 @@ try {
   firebaseConfig = JSON.parse(__firebase_config);
 } catch (e) {
   // 2. สำหรับนำไปใช้งานจริงบน GitHub/Vercel (Fallback)
-  // ⚠️⚠️ แก้ไขตรงนี้: ใส่ค่า Config จริงของคุณที่ได้จาก Firebase Console ⚠️⚠️
   console.warn("Using manual config fallback");
+  
+  // ⚠️⚠️ แก้ไขตรงนี้: ใส่ค่า Config จริงของคุณที่ได้จาก Firebase Console ⚠️⚠️
+  // (ให้แน่ใจว่าลบ const firebaseConfig = { ... } ที่ก๊อปมาออก ให้เหลือแค่ตัวแปรข้างใน)
   firebaseConfig = {
-    const firebaseConfig = {
   apiKey: "AIzaSyDT85bqZgIVKTsoqJHY3-wktIpgTiNgaME",
   authDomain: "yasothon-service.firebaseapp.com",
   projectId: "yasothon-service",
@@ -30,8 +31,6 @@ try {
   messagingSenderId: "848189212038",
   appId: "1:848189212038:web:fb0f41ed30195941991807",
   measurementId: "G-NR3PGN2NG3"
-};
-
   };
 }
 
