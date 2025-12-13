@@ -97,8 +97,8 @@ const ServiceSummaryApp = () => {
         }
       } catch (error) {
         console.error("Auth Error:", error);
-        if (error.code === 'auth/api-key-not-valid') {
-           setErrorMsg("API Key ไม่ถูกต้อง (กรุณาตรวจสอบการตั้งค่า Firebase ในโค้ด)");
+        if (error.code === 'auth/api-key-not-valid' || error.code === 'app/no-options') {
+           setErrorMsg("การตั้งค่า Firebase ไม่ถูกต้อง (กรุณาตรวจสอบ API Key ในไฟล์ src/App.jsx)");
         } else {
            setErrorMsg("ไม่สามารถเชื่อมต่อระบบสมาชิกได้");
         }
@@ -601,7 +601,9 @@ const ServiceSummaryApp = () => {
         </div>
 
         <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center text-xs text-gray-500 print:hidden">
-          <div>ระบบฐานข้อมูลกลาง: Firestore (Google Cloud) | สถานะ: {user ? 'เชื่อมต่อสมบูรณ์' : 'กำลังเชื่อมต่อ...'}</div>
+          <div>
+            {isAdmin && `ระบบฐานข้อมูลกลาง: Firestore (Google Cloud) | สถานะ: ${user ? 'เชื่อมต่อสมบูรณ์' : 'กำลังเชื่อมต่อ...'}`}
+          </div>
           <div className="flex gap-4">
              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#D32F2F]"></div> เสาร์-อาทิตย์</span>
              <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#4CAF50]"></div> วันทำการ</span>
