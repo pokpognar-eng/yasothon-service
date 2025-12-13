@@ -70,7 +70,6 @@ const ServiceSummaryApp = () => {
     weekendRed: '#D32F2F',   // แดงวันหยุด
     weekdayGreen: '#4CAF50', // เขียววันธรรมดา
     bg: '#F3F4F6',
-    // คืนค่าสีปุ่มที่เคยหายไป
     blue: '#0288D1', 
     orange: '#F57C00',
     purple: '#4A2C6D',
@@ -537,7 +536,7 @@ const ServiceSummaryApp = () => {
         </div>
 
         <div className="p-4 bg-white print:p-0">
-          <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-inner custom-scrollbar pb-2 print:border-none print:shadow-none print:overflow-visible">
+          <div className="overflow-x-auto rounded-xl border border-gray-400 shadow-inner custom-scrollbar pb-2 print:border-none print:shadow-none print:overflow-visible">
             <table className="w-full border-collapse min-w-[1200px] print:min-w-full print:text-[8px]">
               <thead>
                 <tr className="text-white" style={{ backgroundColor: colors.headerPurple }}>
@@ -580,13 +579,13 @@ const ServiceSummaryApp = () => {
               </thead>
               <tbody>
                 {serviceUnits.map((unit, index) => (
-                  <tr key={index} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-100 print:border-gray-300">
-                    <td className="p-1 text-center text-xs font-bold text-gray-400 bg-gray-50 border-r border-gray-200 group-hover:bg-blue-100/30 print:text-black print:border-gray-400 print:text-[8px] print:p-0.5">{index + 1}</td>
-                    <td className="p-1 text-xs font-medium text-gray-700 border-r border-gray-200 group-hover:text-[#0288D1] transition-colors whitespace-nowrap print:text-black print:border-gray-400 print:text-[8px] print:p-0.5">{unit}</td>
+                  <tr key={index} className="group hover:bg-blue-50/50 transition-colors border-b border-gray-300 print:border-gray-300">
+                    <td className="p-1 text-center text-xs font-bold text-gray-400 bg-gray-50 border-r border-gray-300 group-hover:bg-blue-100/30 print:text-black print:border-gray-400 print:text-[8px] print:p-0.5">{index + 1}</td>
+                    <td className="p-1 text-xs font-medium text-gray-700 border-r border-gray-300 group-hover:text-[#0288D1] transition-colors whitespace-nowrap print:text-black print:border-gray-400 print:text-[8px] print:p-0.5">{unit}</td>
                     {days.map(day => {
                       const { isWeekend } = getDayInfo(day);
                       return (
-                        <td key={day} className={`p-0 h-8 border-r border-gray-100 relative transition-colors ${isWeekend ? 'bg-red-50 print:bg-red-50' : ''} print:border-gray-400 print:h-5`}>
+                        <td key={day} className={`p-0 h-8 border-r border-gray-300 relative transition-colors ${isWeekend ? 'bg-red-50 print:bg-red-50' : ''} print:border-gray-400 print:h-5`}>
                           <input 
                             type="text" 
                             maxLength={3} 
@@ -595,7 +594,7 @@ const ServiceSummaryApp = () => {
                             onChange={(e) => handleInputChange(index, day, e.target.value)} 
                             className={`input-cell w-full h-full text-center text-xs bg-transparent outline-none transition-all duration-200 
                               ${isWeekend ? 'text-red-500 placeholder-red-200 font-medium' : 'text-gray-700 font-bold hover:bg-blue-50 focus:bg-white'}
-                              print:text-black print:text-[8px] print:h-full print:leading-none
+                              print:text-black print:text-[8px] print:h-full print:leading-none print:font-semibold
                             `}
                           />
                         </td>
@@ -606,10 +605,10 @@ const ServiceSummaryApp = () => {
               </tbody>
               <tfoot>
                 <tr className="shadow-lg relative z-10 print:shadow-none" style={{ backgroundColor: '#E3F2FD' }}>
-                  <td colSpan="2" className="p-2 text-right font-bold text-xs text-[#0288D1] border-r border-blue-200 print:text-black print:border-gray-400 print:text-[8px] print:p-1">📊 รวมยอดรายวัน</td>
+                  <td colSpan="2" className="p-2 text-right font-bold text-xs text-[#0288D1] border-r border-blue-300 print:text-black print:border-gray-400 print:text-[8px] print:p-1">📊 รวมยอดรายวัน</td>
                   {days.map(day => {
                      const total = calculateDailyTotal(day);
-                     return <td key={`total-${day}`} className="p-1 text-center text-xs font-bold text-[#0288D1] border-r border-blue-200 bg-blue-50 print:text-black print:bg-gray-100 print:border-gray-400 print:text-[8px] print:p-0">{total > 0 && <span className="inline-block px-1 py-0.5 rounded bg-[#0288D1] text-white text-[10px] shadow-sm print:bg-transparent print:text-black print:shadow-none print:p-0">{total}</span>}</td>;
+                     return <td key={`total-${day}`} className="p-1 text-center text-xs font-bold text-[#0288D1] border-r border-blue-300 bg-blue-50 print:text-black print:bg-gray-100 print:border-gray-400 print:text-[8px] print:p-0">{total > 0 && <span className="inline-block px-1 py-0.5 rounded bg-[#0288D1] text-white text-[10px] shadow-sm print:bg-transparent print:text-black print:shadow-none print:p-0">{total}</span>}</td>;
                   })}
                 </tr>
               </tfoot>
@@ -659,9 +658,20 @@ const ServiceSummaryApp = () => {
           
           /* Table Adjustments for Print */
           table { width: 100% !important; font-size: 8px !important; table-layout: fixed; }
-          th, td { border: 1px solid #999 !important; }
+          th, td { border: 1px solid #000 !important; }
           
-          input { border: none !important; text-align: center; background: transparent !important; padding: 0 !important; margin: 0 !important; width: 100% !important; height: auto !important; font-size: 8px !important; }
+          input { 
+            border: none !important; 
+            text-align: center; 
+            background: transparent !important; 
+            padding: 0 !important; 
+            margin: 0 !important; 
+            width: 100% !important; 
+            height: auto !important; 
+            font-size: 8px !important;
+            color: #000 !important;
+            font-weight: 600 !important;
+          }
           
           /* Force Background Colors */
           .bg-red-50 { background-color: #fef2f2 !important; }
